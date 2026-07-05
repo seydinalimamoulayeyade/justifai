@@ -272,15 +272,27 @@ resource "aws_lambda_event_source_mapping" "notify" {
 
 # ---------------------------------------------------------------------------
 # API Gateway (HTTP API) -> request-upload
-# TODO: ajouter un authorizer JWT Cognito devant les routes.
+# Protégée par un authorizer JWT Cognito (voir cognito.tf).
 # ---------------------------------------------------------------------------
 resource "aws_apigatewayv2_api" "http" {
   name          = "${local.name}-api"
   protocol_type = "HTTP"
   cors_configuration {
-    allow_origins = ["*"]
+    allow_origins = var.allowed_origins
     allow_methods = ["GET", "POST", "OPTIONS"]
     allow_headers = ["content-type", "authorization"]
+  }
+}
+
+resource "aws_apigatewayv2_authorizer" "cognito" {
+  api_id           = aws_apigatewayv2_api.http.id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
+  name             = "${local.name}-cognito-jwt"
+
+  jwt_configuration {
+    audience = [aws_cognito_user_pool_client.spa.id]
+    issuer   = "https://cognito-idp.${var.aws_region}.amazonaws.com/${aws_cognito_user_pool.main.id}"
   }
 }
 
@@ -292,9 +304,11 @@ resource "aws_apigatewayv2_integration" "request_upload" {
 }
 
 resource "aws_apigatewayv2_route" "request_upload" {
-  api_id    = aws_apigatewayv2_api.http.id
-  route_key = "POST /uploads"
-  target    = "integrations/${aws_apigatewayv2_integration.request_upload.id}"
+  api_id             = aws_apigatewayv2_api.http.id
+  route_key          = "POST /uploads"
+  target             = "integrations/${aws_apigatewayv2_integration.request_upload.id}"
+  authorization_type = "JWT"
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito.id
 }
 
 resource "aws_apigatewayv2_stage" "default" {
