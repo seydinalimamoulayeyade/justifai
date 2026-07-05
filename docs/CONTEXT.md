@@ -33,19 +33,31 @@ proche du **free tier** (pas d'EC2/NAT/RDS ; tout est pay-per-use).
 
 ## Non fait / à valider
 
-- [ ] `terraform fmt/validate` en local (pas encore exécuté)
-- [ ] `node --check` sur les 3 handlers
+- [x] `terraform fmt/validate` en local (validé — Success)
+- [x] `node --check` sur les 3 handlers (OK)
+- [x] Build frontend (`npm run build`) OK
 - [ ] Tester le déploiement (`terraform apply`) sur un compte AWS
 
 ## Prochaines étapes (roadmap)
 
-1. **Cognito** : User Pool + authorizer JWT sur l'API Gateway
-   (⚠️ l'API est ouverte en l'état — à sécuriser avant toute exposition).
+1. ✅ **Cognito** : User Pool + client SPA + authorizer JWT sur l'API Gateway.
+   L'API est désormais protégée ; le front envoie l'idToken en Bearer.
 2. **CloudFront + Route 53 + ACM** devant le front S3 (HTTPS + domaine).
-3. **Alarmes CloudWatch** : erreurs Lambda, profondeur de la DLQ.
+3. ✅ **Alarmes CloudWatch** : erreurs des 3 Lambdas + profondeur de la DLQ
+   (topic SNS `-alarms` dédié, abonnement email optionnel via `alarm_email`).
 4. **Dashboard admin** : revue des documents en statut `REVIEW`.
 5. Modularisation Terraform (modules réutilisables).
 6. **Toujours** : `terraform destroy` après démonstration.
+
+## Config à renseigner après `terraform apply`
+
+Récupérer les outputs et les injecter dans le `.env` du front :
+
+- `cognito_user_pool_id` -> `VITE_COGNITO_USER_POOL_ID`
+- `cognito_client_id`    -> `VITE_COGNITO_CLIENT_ID`
+- `api_endpoint`         -> `VITE_API_BASE_URL`
+
+Créer un utilisateur de test : `aws cognito-idp admin-create-user ...`.
 
 ## Rappels de méthode (voir steering global)
 

@@ -88,8 +88,21 @@ NAT ni RDS).
 
 ## Statut
 
-🚧 Squelette initial — infrastructure et fonctions en cours d'implémentation.
-Voir les `TODO` dans le code Terraform et les Lambdas.
+Fonctionnel de bout en bout au niveau IaC + code. Réalisé :
+
+- ✅ Infrastructure Terraform complète (S3, DynamoDB, SQS/DLQ, SNS, 3 Lambdas,
+  API Gateway, IAM moindre privilège) — `terraform validate` OK.
+- ✅ **Authentification Cognito** (User Pool + client SPA) et **authorizer JWT**
+  devant l'API — l'API n'est plus ouverte.
+- ✅ **Alarmes CloudWatch** : erreurs des 3 Lambdas + profondeur de la DLQ.
+- ✅ Frontend React connecté à Cognito (login) et à l'API (build Vite OK).
+- ✅ CI GitHub Actions : `terraform fmt/validate`, `node --check`, build frontend.
+
+Prochaines étapes : CloudFront + Route 53 + ACM devant le front, dashboard admin
+pour les documents en statut `REVIEW`, modularisation Terraform.
+
+> Note : les alertes de sécurité npm restantes (`esbuild`/`vite`) concernent le
+> **serveur de dev** uniquement et n'affectent pas le build de production.
 
 ## Auteur
 
