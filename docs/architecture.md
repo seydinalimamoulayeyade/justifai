@@ -6,24 +6,33 @@ JustifAI est une application **serverless, event-driven**. Aucune ressource
 n'est allumée en permanence : chaque composant ne s'exécute (et n'est facturé)
 qu'à l'usage.
 
+![Architecture JustifAI](architecture.png)
+
+> Ce diagramme est généré en **diagram-as-code** depuis `architecture.py`
+> (lib `diagrams` + Graphviz). Le régénérer : `python docs/architecture.py`.
+
 ```
-Route53 + ACM  ->  CloudFront  ->  S3 (front React statique)
+Usager/Admin --(login)--> Cognito (User Pool + groupe admin)
+Usager/Admin --(JWT)----> API Gateway (HTTP API, authorizer JWT)
                                      |
-                            API Gateway (HTTP API) + Cognito
-                                     |
-                     Lambda: request-upload / list / status
-                                     |
-                          S3 (bucket justificatifs)
-                                     |  event: ObjectCreated
-                              Lambda: process-document
+              +----------------------+----------------------+
+              v                                             v
+   Lambda: request-upload                        Lambda: admin-documents
+     (POST /uploads)                          (GET/PATCH /documents, groupe admin)
+              |                                             |
+     URL S3 présignée                              query/update (GSI status)
+              v                                             v
+        S3 (justificatifs)  --event ObjectCreated-->  DynamoDB (+ GSI status-index)
+                                     |                       ^
+                              Lambda: process-document ------+
                           +----------+--------------+
                           v          v              v
                      Textract    DynamoDB       SQS (+ DLQ)
                     (OCR/champs)  (statut)          |
                                                      v
                                               Lambda: notify -> SNS (email)
-                                     |
-                              CloudWatch (logs / métriques / alarmes)
+
+CloudWatch (alarmes: erreurs Lambda + profondeur DLQ) -> SNS alarmes
 ```
 
 ## Flux détaillé
@@ -41,8 +50,9 @@ Route53 + ACM  ->  CloudFront  ->  S3 (front React statique)
    - envoi d'un message dans **SQS**.
 5. **Notification** — `notify` consomme la file SQS et publie sur **SNS**
    (email à l'usager). Les échecs partent en **Dead Letter Queue** (DLQ).
-6. **Suivi** — le front interroge l'API (`list` / `status`) pour afficher l'état
-   des justificatifs.
+6. **Revue admin** — un membre du groupe Cognito `admin` accède au dashboard :
+   `admin-documents` liste les documents en statut `REVIEW` (Query sur le GSI
+   `status-index`) et permet de les valider/rejeter (`PATCH /documents/{id}`).
 
 ## Décisions d'architecture
 
@@ -71,14 +81,18 @@ Table `documents` (clé de partition `documentId`) :
 | documentId | UUID du justificatif |
 | userId | identifiant Cognito de l'usager |
 | type | type détecté (CNI, domicile, ...) |
-| status | PENDING / PROCESSED / REVIEW / REJECTED |
+| status | PROCESSED / REVIEW / VALIDATED / REJECTED |
 | fields | champs extraits par Textract (JSON) |
 | createdAt | horodatage ISO |
+| reviewedAt | horodatage de la décision admin (si revue) |
+
+> Un **index secondaire global** `status-index` (clé `status`, tri `createdAt`)
+> permet au dashboard admin de requêter les documents par statut.
 
 ## Améliorations prévues (roadmap)
 
-- [ ] Cognito + autorizer JWT sur l'API Gateway
+- [x] Cognito + authorizer JWT sur l'API Gateway
+- [x] Modularisation Terraform (modules réutilisables)
+- [x] Alarmes CloudWatch (erreurs Lambda, profondeur DLQ)
+- [x] Tableau de bord admin (revue des documents en statut REVIEW)
 - [ ] CloudFront + Route 53 + ACM devant le front
-- [ ] Modularisation Terraform (modules réutilisables)
-- [ ] Alarmes CloudWatch (erreurs Lambda, profondeur DLQ)
-- [ ] Tableau de bord admin (revue des documents en statut REVIEW)
