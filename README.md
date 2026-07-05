@@ -13,9 +13,11 @@ aucun serveur allumé en permanence).
 
 ![Architecture JustifAI](docs/architecture.png)
 
-> Diagramme généré en **diagram-as-code** (`docs/architecture.py`, lib
+> Diagramme éditable dans [`docs/architecture.drawio`](docs/architecture.drawio)
+> (à ouvrir sur [draw.io](https://app.diagrams.net)). Une variante générée en
+> **diagram-as-code** est aussi disponible (`docs/architecture.py`, lib
 > [`diagrams`](https://diagrams.mingrammer.com/) + Graphviz) : reproductible et
-> versionné. Régénérer avec `python docs/architecture.py`.
+> versionnée — `python docs/architecture.py` → `docs/architecture-as-code.png`.
 
 Détails et décisions d'architecture : [docs/architecture.md](docs/architecture.md).
 
