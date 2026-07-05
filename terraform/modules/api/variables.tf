@@ -18,6 +18,16 @@ variable "request_upload_function_name" {
   type        = string
 }
 
+variable "admin_documents_invoke_arn" {
+  description = "Invoke ARN de la Lambda admin-documents"
+  type        = string
+}
+
+variable "admin_documents_function_name" {
+  description = "Nom de la Lambda admin-documents"
+  type        = string
+}
+
 variable "cognito_issuer" {
   description = "Issuer JWT du User Pool Cognito"
   type        = string

@@ -19,6 +19,12 @@ data "archive_file" "notify" {
   output_path = "${var.build_dir}/notify.zip"
 }
 
+data "archive_file" "admin_documents" {
+  type        = "zip"
+  source_dir  = "${var.lambda_source_base}/admin-documents"
+  output_path = "${var.build_dir}/admin-documents.zip"
+}
+
 # ---------------------------------------------------------------------------
 # IAM : un rôle par Lambda (least-privilege)
 # ---------------------------------------------------------------------------
@@ -47,9 +53,14 @@ resource "aws_iam_role" "notify" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
 }
 
+resource "aws_iam_role" "admin_documents" {
+  name               = "${var.name}-admin-documents"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume.json
+}
+
 # Logs CloudWatch pour toutes les Lambdas
 resource "aws_iam_role_policy_attachment" "logs" {
-  for_each   = toset([aws_iam_role.request_upload.name, aws_iam_role.process_document.name, aws_iam_role.notify.name])
+  for_each   = toset([aws_iam_role.request_upload.name, aws_iam_role.process_document.name, aws_iam_role.notify.name, aws_iam_role.admin_documents.name])
   role       = each.value
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
@@ -120,6 +131,27 @@ resource "aws_iam_role_policy" "notify" {
   })
 }
 
+# admin-documents : requêter par statut (GSI) + mettre à jour un document
+resource "aws_iam_role_policy" "admin_documents" {
+  name = "admin-documents"
+  role = aws_iam_role.admin_documents.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["dynamodb:Query"]
+        Resource = "${var.table_arn}/index/*"
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["dynamodb:UpdateItem", "dynamodb:GetItem"]
+        Resource = var.table_arn
+      }
+    ]
+  })
+}
+
 # ---------------------------------------------------------------------------
 # Lambdas
 # ---------------------------------------------------------------------------
@@ -168,6 +200,23 @@ resource "aws_lambda_function" "notify" {
   environment {
     variables = {
       TOPIC_ARN = var.topic_arn
+    }
+  }
+}
+
+resource "aws_lambda_function" "admin_documents" {
+  function_name    = "${var.name}-admin-documents"
+  role             = aws_iam_role.admin_documents.arn
+  runtime          = "nodejs20.x"
+  handler          = "index.handler"
+  filename         = data.archive_file.admin_documents.output_path
+  source_code_hash = data.archive_file.admin_documents.output_base64sha256
+  timeout          = 10
+
+  environment {
+    variables = {
+      TABLE        = var.table_name
+      STATUS_INDEX = "status-index"
     }
   }
 }
