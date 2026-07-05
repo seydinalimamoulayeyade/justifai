@@ -1,29 +1,29 @@
 output "documents_bucket" {
   description = "Nom du bucket S3 des justificatifs"
-  value       = aws_s3_bucket.documents.bucket
+  value       = module.storage.bucket_name
 }
 
 output "documents_table" {
   description = "Nom de la table DynamoDB"
-  value       = aws_dynamodb_table.documents.name
+  value       = module.storage.table_name
 }
 
 output "api_endpoint" {
   description = "URL de base de l'API HTTP"
-  value       = aws_apigatewayv2_api.http.api_endpoint
+  value       = module.api.api_endpoint
 }
 
 output "notifications_topic_arn" {
   description = "ARN du topic SNS de notification"
-  value       = aws_sns_topic.notifications.arn
+  value       = module.messaging.topic_arn
 }
 
 output "cognito_user_pool_id" {
   description = "ID du User Pool Cognito"
-  value       = aws_cognito_user_pool.main.id
+  value       = module.auth.user_pool_id
 }
 
 output "cognito_client_id" {
   description = "ID du client applicatif (SPA) Cognito"
-  value       = aws_cognito_user_pool_client.spa.id
+  value       = module.auth.client_id
 }
