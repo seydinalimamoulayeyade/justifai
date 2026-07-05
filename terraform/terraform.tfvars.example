@@ -1,0 +1,5 @@
+# Copier en terraform.tfvars et renseigner les valeurs.
+aws_region         = "eu-west-1"
+project_name       = "justifai"
+environment        = "dev"
+notification_email = "change-me@example.com"
