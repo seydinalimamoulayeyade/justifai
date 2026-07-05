@@ -1,0 +1,10 @@
+{
+  "name": "justifai-request-upload",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Génère une URL S3 présignée pour l'upload d'un justificatif",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/s3-request-presigner": "^3.600.0"
+  }
+}

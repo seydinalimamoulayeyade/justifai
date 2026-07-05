@@ -1,0 +1,12 @@
+{
+  "name": "justifai-process-document",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Extrait le contenu via Textract et enregistre le statut",
+  "dependencies": {
+    "@aws-sdk/client-textract": "^3.600.0",
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.600.0",
+    "@aws-sdk/client-sqs": "^3.600.0"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "name": "justifai-notify",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Publie les notifications SNS à partir des messages SQS",
+  "dependencies": {
+    "@aws-sdk/client-sns": "^3.600.0"
+  }
+}
