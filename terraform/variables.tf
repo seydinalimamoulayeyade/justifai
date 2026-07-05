@@ -20,3 +20,15 @@ variable "notification_email" {
   description = "Email abonné au topic SNS de notification"
   type        = string
 }
+
+variable "allowed_origins" {
+  description = "Origines autorisées par le CORS de l'API (front)"
+  type        = list(string)
+  default     = ["http://localhost:5173"]
+}
+
+variable "alarm_email" {
+  description = "Email destinataire des alarmes CloudWatch (vide = pas d'abonnement)"
+  type        = string
+  default     = ""
+}
