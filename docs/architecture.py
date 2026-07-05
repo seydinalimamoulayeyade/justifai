@@ -1,6 +1,8 @@
 """Diagramme d'architecture JustifAI (diagram-as-code).
 
-Génère docs/architecture.png à partir du code, avec les icônes AWS officielles.
+Génère docs/architecture-as-code.png à partir du code, avec les icônes AWS
+officielles. (Le visuel principal du README, docs/architecture.png, est le
+rendu draw.io — voir docs/architecture.drawio.)
 
 Pré-requis :
     - Graphviz (binaire `dot`) : https://graphviz.org/download/
@@ -31,7 +33,7 @@ graph_attr = {
 
 with Diagram(
     "JustifAI — architecture serverless AWS",
-    filename="docs/architecture",
+    filename="docs/architecture-as-code",
     show=False,
     direction="LR",
     graph_attr=graph_attr,

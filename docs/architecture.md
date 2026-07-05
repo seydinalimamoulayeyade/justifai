@@ -8,8 +8,9 @@ qu'à l'usage.
 
 ![Architecture JustifAI](architecture.png)
 
-> Ce diagramme est généré en **diagram-as-code** depuis `architecture.py`
-> (lib `diagrams` + Graphviz). Le régénérer : `python docs/architecture.py`.
+> Diagramme éditable : `architecture.drawio` (ouvrir sur draw.io). Une variante
+> **diagram-as-code** existe aussi : `python docs/architecture.py` génère
+> `architecture-as-code.png` (lib `diagrams` + Graphviz).
 
 ```
 Usager/Admin --(login)--> Cognito (User Pool + groupe admin)
