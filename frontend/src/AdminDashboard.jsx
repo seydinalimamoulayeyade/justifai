@@ -5,6 +5,18 @@ const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
 const today = new Date().toLocaleDateString("fr-FR");
 
+function badgeClass(status) {
+  if (status === "VALIDATED") return "badge-valide";
+  if (status === "REJECTED") return "badge-rejete";
+  return "badge-review";
+}
+
+function badgeLabel(status) {
+  if (status === "VALIDATED") return "Validé";
+  if (status === "REJECTED") return "Rejeté";
+  return "À revoir";
+}
+
 /**
  * Vue admin : liste les documents en statut REVIEW et permet de les valider
  * ou rejeter. Réservée aux membres du groupe Cognito "admin".
@@ -13,7 +25,6 @@ export default function AdminDashboard({ token }) {
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [stamping, setStamping] = useState({}); // documentId -> true pendant l'animation
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -49,15 +60,10 @@ export default function AdminDashboard({ token }) {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
-      const remove = () => setDocs((prev) => prev.filter((d) => d.documentId !== documentId));
-
-      if (status === "VALIDATED") {
-        // Appose le tampon, puis retire le dossier de la liste des "à revoir".
-        setStamping((s) => ({ ...s, [documentId]: true }));
-        setTimeout(remove, 1100);
-      } else {
-        remove();
-      }
+      // Mise à jour visuelle : la carte reste (tampon + badge), retirée au Rafraîchir.
+      setDocs((prev) =>
+        prev.map((d) => (d.documentId === documentId ? { ...d, status, decided: true } : d))
+      );
     } catch (err) {
       console.error(err);
       setError("La mise à jour a échoué.");
@@ -92,17 +98,19 @@ export default function AdminDashboard({ token }) {
                   <p className="dossier-name">{d.type ?? "INCONNU"}</p>
                   <p className="dossier-meta">déposé le {created}</p>
                 </div>
-                <span className="badge badge-review">À revoir</span>
+                <span className={`badge ${badgeClass(d.status)}`}>{badgeLabel(d.status)}</span>
               </div>
-              <div className="dossier-actions">
-                <button className="btn-ghost" onClick={() => decide(d.documentId, "VALIDATED")}>
-                  Valider
-                </button>
-                <button className="btn-ghost" onClick={() => decide(d.documentId, "REJECTED")}>
-                  Rejeter
-                </button>
-              </div>
-              {stamping[d.documentId] && <Stamp id={d.documentId} date={today} />}
+              {!d.decided && (
+                <div className="dossier-actions">
+                  <button className="btn-ghost" onClick={() => decide(d.documentId, "VALIDATED")}>
+                    Valider
+                  </button>
+                  <button className="btn-ghost" onClick={() => decide(d.documentId, "REJECTED")}>
+                    Rejeter
+                  </button>
+                </div>
+              )}
+              {d.status === "VALIDATED" && <Stamp id={d.documentId} date={today} />}
             </div>
           );
         })}
