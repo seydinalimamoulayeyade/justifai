@@ -11,23 +11,11 @@ aucun serveur allumé en permanence).
 
 ## Architecture
 
-```
-Route53 + ACM  ->  CloudFront  ->  S3 (front React)
-                                     |
-                            API Gateway + Cognito (auth)
-                                     |
-                     Lambda (URL signee / liste / statut)
-                                     |
-                          S3 (bucket justificatifs)
-                                     |  (event ObjectCreated)
-                              Lambda (traitement)
-                          +----------+--------------+
-                          v          v              v
-                     Textract    DynamoDB     SQS -> Lambda -> SNS (email)
-                    (OCR/champs)  (statut)    (retry + DLQ)
-                                     |
-                              CloudWatch (logs / alarmes)
-```
+![Architecture JustifAI](docs/architecture.png)
+
+> Diagramme généré en **diagram-as-code** (`docs/architecture.py`, lib
+> [`diagrams`](https://diagrams.mingrammer.com/) + Graphviz) : reproductible et
+> versionné. Régénérer avec `python docs/architecture.py`.
 
 Détails et décisions d'architecture : [docs/architecture.md](docs/architecture.md).
 
