@@ -1,0 +1,30 @@
+# Node
+node_modules/
+npm-debug.log*
+dist/
+build/
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+*.pem
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+crash.log
+*.tfvars
+!*.tfvars.example
+.terraform.lock.hcl
+
+# Lambda build artifacts
+*.zip
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.kiro/
