@@ -68,6 +68,9 @@ terraform plan            # prévisualiser l'infrastructure
 
 > Pense à `terraform destroy` après démonstration pour éviter tout coût résiduel.
 
+Runbook complet (déploiement, user admin Cognito, démo, nettoyage) :
+[docs/DEPLOY.md](docs/DEPLOY.md).
+
 ## Coût
 
 Conçu pour le **free tier** : Lambda, DynamoDB (on-demand), S3, SQS/SNS et
