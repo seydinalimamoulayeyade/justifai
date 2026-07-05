@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
+import Stamp from "./Stamp";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
+
+const today = new Date().toLocaleDateString("fr-FR");
 
 /**
  * Vue admin : liste les documents en statut REVIEW et permet de les valider
@@ -10,15 +13,14 @@ export default function AdminDashboard({ token }) {
   const [docs, setDocs] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  const authHeaders = { authorization: `Bearer ${token}` };
+  const [stamping, setStamping] = useState({}); // documentId -> true pendant l'animation
 
   const load = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const res = await fetch(`${API_BASE}/documents?status=REVIEW`, {
-        headers: authHeaders,
+        headers: { authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const data = await res.json();
@@ -39,11 +41,23 @@ export default function AdminDashboard({ token }) {
     try {
       const res = await fetch(`${API_BASE}/documents/${documentId}`, {
         method: "PATCH",
-        headers: { ...authHeaders, "content-type": "application/json" },
+        headers: {
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
         body: JSON.stringify({ status }),
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      setDocs((prev) => prev.filter((d) => d.documentId !== documentId));
+
+      const remove = () => setDocs((prev) => prev.filter((d) => d.documentId !== documentId));
+
+      if (status === "VALIDATED") {
+        // Appose le tampon, puis retire le dossier de la liste des "à revoir".
+        setStamping((s) => ({ ...s, [documentId]: true }));
+        setTimeout(remove, 1100);
+      } else {
+        remove();
+      }
     } catch (err) {
       console.error(err);
       setError("La mise à jour a échoué.");
@@ -51,41 +65,48 @@ export default function AdminDashboard({ token }) {
   }
 
   return (
-    <section style={{ marginTop: "2rem", borderTop: "1px solid #ddd", paddingTop: "1rem" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <h2 style={{ margin: 0 }}>Documents à revoir</h2>
-        <button onClick={load} disabled={loading}>
+    <>
+      <div className="section-head">
+        <p className="section-label">Documents à revoir</p>
+        <button className="btn-ghost" onClick={load} disabled={loading}>
           {loading ? "Chargement..." : "Rafraîchir"}
         </button>
       </div>
 
-      {error && <p style={{ color: "crimson" }}>{error}</p>}
-      {!loading && docs.length === 0 && <p>Aucun document en attente de revue.</p>}
+      {error && <p className="error">{error}</p>}
+      {!loading && docs.length === 0 && (
+        <div className="empty-state">Aucun document en attente de revue.</div>
+      )}
 
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {docs.map((d) => (
-          <li
-            key={d.documentId}
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0.5rem 0",
-              borderBottom: "1px solid #eee",
-            }}
-          >
-            <span>
-              <strong>{d.type ?? "INCONNU"}</strong>
-              <br />
-              <small>{d.documentId}</small>
-            </span>
-            <span>
-              <button onClick={() => decide(d.documentId, "VALIDATED")}>Valider</button>{" "}
-              <button onClick={() => decide(d.documentId, "REJECTED")}>Rejeter</button>
-            </span>
-          </li>
-        ))}
-      </ul>
-    </section>
+      <div className="dossiers">
+        {docs.map((d) => {
+          const ref = String(d.documentId).slice(0, 8);
+          const created = d.createdAt
+            ? new Date(d.createdAt).toLocaleDateString("fr-FR")
+            : "—";
+          return (
+            <div className="dossier" key={d.documentId}>
+              <div className="dossier-top">
+                <div>
+                  <p className="dossier-ref">N° {ref}</p>
+                  <p className="dossier-name">{d.type ?? "INCONNU"}</p>
+                  <p className="dossier-meta">déposé le {created}</p>
+                </div>
+                <span className="badge badge-review">À revoir</span>
+              </div>
+              <div className="dossier-actions">
+                <button className="btn-ghost" onClick={() => decide(d.documentId, "VALIDATED")}>
+                  Valider
+                </button>
+                <button className="btn-ghost" onClick={() => decide(d.documentId, "REJECTED")}>
+                  Rejeter
+                </button>
+              </div>
+              {stamping[d.documentId] && <Stamp id={d.documentId} date={today} />}
+            </div>
+          );
+        })}
+      </div>
+    </>
   );
 }

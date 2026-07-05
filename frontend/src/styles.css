@@ -1,0 +1,382 @@
+:root {
+  --paper: #efe8d8;
+  --paper-panel: #e1d6ba;
+  --card-bg: #f7f2e7;
+  --ink: #1d2a3d;
+  --stamp: #a63a2e;
+  --folder-green: #3f5a43;
+  --rule: #c7bc9c;
+  --muted: #746b58;
+  --review: #a6772e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: "Inter", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem 4rem;
+}
+
+/* --- En-tête / papier à en-tête --- */
+.letterhead {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.wordmark {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.2rem;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.wordmark span {
+  color: var(--stamp);
+}
+
+.tagline {
+  font-size: 0.9rem;
+  color: var(--muted);
+  margin: 0.35rem 0 1.1rem;
+  letter-spacing: 0.02em;
+}
+
+.double-rule {
+  height: 5px;
+  border-top: 1.5px solid var(--ink);
+  border-bottom: 0.5px solid var(--ink);
+}
+
+/* --- Barre utilisateur --- */
+.topbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 1.5rem;
+}
+
+.user-chip {
+  font-family: "Space Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+/* --- Disposition --- */
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.75rem;
+  align-items: start;
+}
+
+.layout.single {
+  grid-template-columns: minmax(0, 460px);
+  just-content: center;
+}
+
+@media (max-width: 720px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section-label {
+  font-family: "Space Mono", monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.75rem;
+}
+
+/* --- Panneau (chemise cartonnée) --- */
+.folder {
+  background: var(--paper-panel);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 1.25rem;
+  position: relative;
+}
+
+.folder::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 20px;
+  width: 90px;
+  height: 12px;
+  background: var(--paper-panel);
+  border: 1px solid var(--rule);
+  border-bottom: none;
+  border-radius: 3px 3px 0 0;
+}
+
+.login-card {
+  margin: 0 auto;
+  max-width: 420px;
+}
+
+.field {
+  margin-bottom: 0.9rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.field input,
+.field select {
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  font-family: "Inter", sans-serif;
+  font-size: 0.9rem;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  color: var(--ink);
+}
+
+.field input:focus,
+.field select:focus,
+button:focus-visible,
+.dropzone:focus-within {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.dropzone {
+  display: block;
+  border: 1.5px dashed var(--rule);
+  border-radius: 2px;
+  padding: 1.2rem 0.75rem;
+  text-align: center;
+  font-size: 0.84rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  background: var(--card-bg);
+  cursor: pointer;
+}
+
+.dropzone strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 0.65rem;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  border-radius: 2px;
+  font-family: "Inter", sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+}
+
+.btn-primary:hover {
+  background: #14202f;
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  padding: 0.4rem 0.7rem;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  font-family: "Inter", sans-serif;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-ghost:hover {
+  background: var(--paper-panel);
+}
+
+.status-line {
+  font-family: "Space Mono", monospace;
+  font-size: 0.78rem;
+  color: var(--ink);
+  margin: 0.9rem 0 0;
+}
+
+.error {
+  color: var(--stamp);
+  font-size: 0.82rem;
+  margin: 0.75rem 0 0;
+}
+
+/* --- Liste des dossiers --- */
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dossiers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.dossier {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  padding: 0.95rem 1rem 0.95rem 2.4rem;
+  overflow: hidden;
+}
+
+.dossier::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 26px;
+  background-image: radial-gradient(circle at 13px 11px, var(--paper) 4px, transparent 4.5px);
+  background-size: 26px 22px;
+  background-repeat: repeat-y;
+  border-right: 1px dashed var(--rule);
+}
+
+.dossier-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.dossier-ref {
+  font-family: "Space Mono", monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  margin: 0;
+}
+
+.dossier-name {
+  font-size: 0.94rem;
+  font-weight: 500;
+  margin: 0.15rem 0 0.1rem;
+  word-break: break-all;
+}
+
+.dossier-meta {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin: 0;
+}
+
+.dossier-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+.badge {
+  font-family: "Space Mono", monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.55rem;
+  border-radius: 2px;
+  white-space: nowrap;
+}
+
+.badge-review {
+  background: #f0e4cf;
+  color: var(--review);
+}
+
+.badge-valide {
+  background: #e1e9e2;
+  color: var(--folder-green);
+}
+
+/* --- Tampon (élément signature) --- */
+.stamp-wrap {
+  position: absolute;
+  top: 6px;
+  right: 10px;
+  width: 62px;
+  height: 62px;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.stamp-wrap.show {
+  animation: stampland 0.5s cubic-bezier(0.2, 1.6, 0.4, 1) forwards;
+}
+
+@keyframes stampland {
+  0% {
+    opacity: 0;
+    transform: scale(2.6) rotate(-18deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.92) rotate(-9deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-11deg);
+  }
+}
+
+.stamp-ring {
+  fill: none;
+  stroke: var(--stamp);
+}
+
+.stamp-text {
+  font-family: "Space Mono", monospace;
+  fill: var(--stamp);
+  text-anchor: middle;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+  border: 1px dashed var(--rule);
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stamp-wrap.show {
+    animation: none;
+    opacity: 1;
+    transform: rotate(-11deg);
+  }
+}
