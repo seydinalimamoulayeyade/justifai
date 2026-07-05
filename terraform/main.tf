@@ -8,9 +8,10 @@ data "aws_caller_identity" "current" {}
 # Câblage des modules
 # ---------------------------------------------------------------------------
 module "storage" {
-  source     = "./modules/storage"
-  name       = local.name
-  account_id = data.aws_caller_identity.current.account_id
+  source          = "./modules/storage"
+  name            = local.name
+  account_id      = data.aws_caller_identity.current.account_id
+  allowed_origins = var.allowed_origins
 }
 
 module "messaging" {
