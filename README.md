@@ -61,7 +61,8 @@ justifai/
 ├── docs/                 # architecture & post LinkedIn
 ├── frontend/             # SPA React (Vite) — upload + suivi
 ├── backend/lambdas/      # fonctions Lambda (Node.js)
-├── terraform/            # infrastructure as code
+├── terraform/            # infrastructure as code (modules réutilisables)
+│   └── modules/          # storage, messaging, auth, compute, api, monitoring
 └── .github/workflows/    # CI (fmt / validate / plan)
 ```
 
@@ -98,8 +99,11 @@ Fonctionnel de bout en bout au niveau IaC + code. Réalisé :
 - ✅ Frontend React connecté à Cognito (login) et à l'API (build Vite OK).
 - ✅ CI GitHub Actions : `terraform fmt/validate`, `node --check`, build frontend.
 
+- ✅ **Infrastructure modularisée** : 6 modules Terraform réutilisables
+  (storage, messaging, auth, compute, api, monitoring).
+
 Prochaines étapes : CloudFront + Route 53 + ACM devant le front, dashboard admin
-pour les documents en statut `REVIEW`, modularisation Terraform.
+pour les documents en statut `REVIEW`.
 
 > Note : les alertes de sécurité npm restantes (`esbuild`/`vite`) concernent le
 > **serveur de dev** uniquement et n'affectent pas le build de production.

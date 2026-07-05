@@ -1,9 +1,6 @@
-# ---------------------------------------------------------------------------
 # Cognito : authentification des utilisateurs (User Pool + client SPA)
-# Sécurise l'API HTTP via un authorizer JWT.
-# ---------------------------------------------------------------------------
 resource "aws_cognito_user_pool" "main" {
-  name = "${local.name}-users"
+  name = "${var.name}-users"
 
   username_attributes      = ["email"]
   auto_verified_attributes = ["email"]
@@ -27,7 +24,7 @@ resource "aws_cognito_user_pool" "main" {
 
 # Client applicatif public (SPA) : pas de secret, flux SRP + USER_PASSWORD.
 resource "aws_cognito_user_pool_client" "spa" {
-  name         = "${local.name}-spa"
+  name         = "${var.name}-spa"
   user_pool_id = aws_cognito_user_pool.main.id
 
   generate_secret = false
