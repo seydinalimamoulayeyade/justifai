@@ -1,0 +1,11 @@
+{
+  "name": "admin-documents",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Endpoint admin : lister et revoir les documents (statut REVIEW)",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.600.0",
+    "@aws-sdk/lib-dynamodb": "^3.600.0"
+  }
+}

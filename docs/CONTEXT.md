@@ -45,7 +45,9 @@ proche du **free tier** (pas d'EC2/NAT/RDS ; tout est pay-per-use).
 2. **CloudFront + Route 53 + ACM** devant le front S3 (HTTPS + domaine).
 3. ✅ **Alarmes CloudWatch** : erreurs des 3 Lambdas + profondeur de la DLQ
    (topic SNS `-alarms` dédié, abonnement email optionnel via `alarm_email`).
-4. **Dashboard admin** : revue des documents en statut `REVIEW`.
+4. ✅ **Dashboard admin** : revue des documents en statut `REVIEW` (GSI
+   `status-index`, groupe Cognito `admin`, routes `GET /documents` +
+   `PATCH /documents/{id}`, vue front réservée aux admins).
 5. ✅ **Modularisation Terraform** : infra découpée en 6 modules réutilisables
    (storage, messaging, auth, compute, api, monitoring) ; racine = câblage.
 6. **Toujours** : `terraform destroy` après démonstration.
@@ -59,6 +61,8 @@ Récupérer les outputs et les injecter dans le `.env` du front :
 - `api_endpoint`         -> `VITE_API_BASE_URL`
 
 Créer un utilisateur de test : `aws cognito-idp admin-create-user ...`.
+Pour accéder au dashboard admin, ajouter l'utilisateur au groupe `admin` :
+`aws cognito-idp admin-add-user-to-group --group-name admin ...`.
 
 ## Rappels de méthode (voir steering global)
 

@@ -102,8 +102,10 @@ Fonctionnel de bout en bout au niveau IaC + code. Réalisé :
 - ✅ **Infrastructure modularisée** : 6 modules Terraform réutilisables
   (storage, messaging, auth, compute, api, monitoring).
 
-Prochaines étapes : CloudFront + Route 53 + ACM devant le front, dashboard admin
-pour les documents en statut `REVIEW`.
+- ✅ **Dashboard admin** : revue des documents en statut `REVIEW` (groupe
+  Cognito `admin`, endpoints `GET/PATCH /documents`).
+
+Prochaine étape : CloudFront + Route 53 + ACM devant le front (HTTPS + domaine).
 
 > Note : les alertes de sécurité npm restantes (`esbuild`/`vite`) concernent le
 > **serveur de dev** uniquement et n'affectent pas le build de production.

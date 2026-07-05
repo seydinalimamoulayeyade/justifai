@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { signIn, signOut, getCurrentToken } from "./auth";
+import { signIn, signOut, getCurrentToken, isAdmin } from "./auth";
+import AdminDashboard from "./AdminDashboard";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -114,6 +115,8 @@ export default function App() {
         <button type="submit" disabled={!file}>Déposer</button>
       </form>
       {status && <p>{status}</p>}
+
+      {isAdmin(token) && <AdminDashboard token={token} />}
     </main>
   );
 }

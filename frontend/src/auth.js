@@ -47,3 +47,21 @@ export function signOut() {
   const user = userPool.getCurrentUser();
   if (user) user.signOut();
 }
+
+/** Décode le payload d'un JWT (sans vérification de signature — usage UI seulement). */
+export function decodeToken(token) {
+  try {
+    const payload = token.split(".")[1];
+    const json = atob(payload.replaceAll("-", "+").replaceAll("_", "/"));
+    return JSON.parse(json);
+  } catch {
+    return {};
+  }
+}
+
+/** Indique si le token appartient à un membre du groupe Cognito "admin". */
+export function isAdmin(token) {
+  if (!token) return false;
+  const groups = decodeToken(token)["cognito:groups"] ?? [];
+  return Array.isArray(groups) && groups.includes("admin");
+}

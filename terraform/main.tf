@@ -46,10 +46,12 @@ module "api" {
   name            = local.name
   allowed_origins = var.allowed_origins
 
-  request_upload_invoke_arn    = module.compute.request_upload_invoke_arn
-  request_upload_function_name = module.compute.request_upload_function_name
-  cognito_issuer               = module.auth.issuer
-  cognito_audience             = module.auth.client_id
+  request_upload_invoke_arn     = module.compute.request_upload_invoke_arn
+  request_upload_function_name  = module.compute.request_upload_function_name
+  admin_documents_invoke_arn    = module.compute.admin_documents_invoke_arn
+  admin_documents_function_name = module.compute.admin_documents_function_name
+  cognito_issuer                = module.auth.issuer
+  cognito_audience              = module.auth.client_id
 }
 
 module "monitoring" {

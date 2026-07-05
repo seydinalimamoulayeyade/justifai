@@ -30,6 +30,24 @@ resource "aws_dynamodb_table" "documents" {
     type = "S"
   }
 
+  attribute {
+    name = "status"
+    type = "S"
+  }
+
+  attribute {
+    name = "createdAt"
+    type = "S"
+  }
+
+  # Requête des documents par statut (ex. dashboard admin : statut REVIEW)
+  global_secondary_index {
+    name            = "status-index"
+    hash_key        = "status"
+    range_key       = "createdAt"
+    projection_type = "ALL"
+  }
+
   server_side_encryption {
     enabled = true
   }

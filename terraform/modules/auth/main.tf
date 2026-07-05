@@ -47,3 +47,11 @@ resource "aws_cognito_user_pool_client" "spa" {
 
   prevent_user_existence_errors = "ENABLED"
 }
+
+# Groupe des administrateurs (revue des documents en statut REVIEW).
+# La claim "cognito:groups" du JWT est vérifiée côté Lambda admin.
+resource "aws_cognito_user_group" "admin" {
+  name         = "admin"
+  user_pool_id = aws_cognito_user_pool.main.id
+  description  = "Administrateurs : accès au dashboard de revue"
+}
