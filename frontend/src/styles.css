@@ -323,6 +323,11 @@ button:focus-visible,
   color: var(--folder-green);
 }
 
+.badge-rejete {
+  background: #f3ddda;
+  color: var(--stamp);
+}
+
 /* --- Tampon (élément signature) --- */
 .stamp-wrap {
   position: absolute;
