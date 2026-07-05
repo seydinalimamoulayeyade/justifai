@@ -1,11 +1,11 @@
-# JustifAI — dépôt intelligent de justificatifs administratifs
+# JustifAI : dépôt intelligent de justificatifs administratifs
 
 > Application **serverless** sur AWS : un usager dépose un justificatif (pièce
 > d'identité, justificatif de domicile, attestation…), **Amazon Textract**
 > extrait automatiquement le texte et les champs clés, le document est classé
 > et son statut suivi de bout en bout, avec notification à l'usager.
 
-Projet vitrine **Cloud & DevOps** — architecture event-driven, IaC Terraform,
+Projet vitrine **Cloud & DevOps** : architecture event-driven, IaC Terraform,
 CI/CD GitHub Actions. Pensé pour rester dans le **free tier** AWS (pay-per-use,
 aucun serveur allumé en permanence).
 
@@ -17,7 +17,7 @@ aucun serveur allumé en permanence).
 > (à ouvrir sur [draw.io](https://app.diagrams.net)). Une variante générée en
 > **diagram-as-code** est aussi disponible (`docs/architecture.py`, lib
 > [`diagrams`](https://diagrams.mingrammer.com/) + Graphviz) : reproductible et
-> versionnée — `python docs/architecture.py` → `docs/architecture-as-code.png`.
+> versionnée - `python docs/architecture.py` → `docs/architecture-as-code.png`.
 
 Détails et décisions d'architecture : [docs/architecture.md](docs/architecture.md).
 
@@ -105,6 +105,6 @@ Prochaine étape : CloudFront + Route 53 + ACM devant le front (HTTPS + domaine)
 
 ## Auteur
 
-Seydina Limamou Laye Yade — Cloud & DevOps Engineer · Dakar, Sénégal
+Seydina Limamou Laye Yade - Cloud & DevOps Engineer · Dakar, Sénégal
 [GitHub](https://github.com/seydinalimamoulayeyade) ·
 [LinkedIn](https://linkedin.com/in/limamou-laye) · Licence MIT
