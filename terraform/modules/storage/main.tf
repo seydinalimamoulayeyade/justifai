@@ -20,6 +20,18 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "documents" {
   }
 }
 
+# CORS : autorise le PUT navigateur via URL présignée depuis le front
+resource "aws_s3_bucket_cors_configuration" "documents" {
+  bucket = aws_s3_bucket.documents.id
+  cors_rule {
+    allowed_methods = ["PUT"]
+    allowed_origins = var.allowed_origins
+    allowed_headers = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
+
 resource "aws_dynamodb_table" "documents" {
   name         = "${var.name}-documents"
   billing_mode = "PAY_PER_REQUEST"
