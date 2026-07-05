@@ -10,9 +10,14 @@ const sqs = new SQSClient({});
 const TABLE = process.env.TABLE;
 const QUEUE_URL = process.env.QUEUE_URL;
 
+// Formats non pris en charge par l'API Textract synchrone (PDF/TIFF -> API async).
+const UNSUPPORTED_FORMAT = "UnsupportedDocumentException";
+
 /**
  * Déclenché par un événement S3 (ObjectCreated).
  * Extrait le texte via Textract, écrit le statut en DynamoDB, notifie via SQS.
+ * Un format non supporté par l'OCR n'est pas une erreur : le document est
+ * simplement classé en REVIEW pour une revue manuelle.
  */
 export const handler = async (event) => {
   for (const record of event.Records ?? []) {
@@ -20,6 +25,10 @@ export const handler = async (event) => {
     const key = decodeURIComponent(record.s3.object.key.replace(/\+/g, " "));
     // uploads/<documentId>/<filename>
     const documentId = key.split("/")[1] ?? key;
+
+    let type = "INCONNU";
+    let status = "REVIEW";
+    let fields = {};
 
     try {
       const result = await textract.send(
@@ -32,39 +41,50 @@ export const handler = async (event) => {
         .filter((b) => b.BlockType === "LINE")
         .map((b) => b.Text);
 
-      // Classification minimale (à enrichir) : à partir des mots-clés détectés
       const text = lines.join(" ").toLowerCase();
-      const type = detectType(text);
-      const status = type === "INCONNU" ? "REVIEW" : "PROCESSED";
-
-      await ddb.send(
-        new PutCommand({
-          TableName: TABLE,
-          Item: {
-            documentId,
-            key,
-            type,
-            status,
-            fields: { lineCount: lines.length },
-            createdAt: new Date().toISOString(),
-          },
-        })
-      );
-
-      await sqs.send(
-        new SendMessageCommand({
-          QueueUrl: QUEUE_URL,
-          MessageBody: JSON.stringify({ documentId, type, status }),
-        })
-      );
-
-      console.log(`Traité ${documentId} -> ${type} (${status})`);
+      type = detectType(text);
+      status = type === "INCONNU" ? "REVIEW" : "PROCESSED";
+      fields = { lineCount: lines.length };
     } catch (err) {
-      console.error(`Echec traitement ${key}`, err);
-      throw err; // laisse Lambda relancer / envoyer en échec
+      if (err.name === UNSUPPORTED_FORMAT) {
+        // Format non OCR-isable en synchrone (ex. PDF) : revue manuelle, pas d'échec.
+        type = "INCONNU";
+        status = "REVIEW";
+        fields = { note: "Format non pris en charge par l'OCR — revue manuelle requise" };
+        console.warn(`Format non supporté pour ${key}, classé en REVIEW`);
+      } else {
+        console.error(`Echec traitement ${key}`, err);
+        throw err; // vraie erreur -> retry Lambda + alarme
+      }
     }
+
+    await persistAndNotify({ documentId, key, type, status, fields });
+    console.log(`Traité ${documentId} -> ${type} (${status})`);
   }
 };
+
+async function persistAndNotify({ documentId, key, type, status, fields }) {
+  await ddb.send(
+    new PutCommand({
+      TableName: TABLE,
+      Item: {
+        documentId,
+        key,
+        type,
+        status,
+        fields,
+        createdAt: new Date().toISOString(),
+      },
+    })
+  );
+
+  await sqs.send(
+    new SendMessageCommand({
+      QueueUrl: QUEUE_URL,
+      MessageBody: JSON.stringify({ documentId, type, status }),
+    })
+  );
+}
 
 function detectType(text) {
   if (text.includes("carte") && text.includes("identit")) return "CNI";
