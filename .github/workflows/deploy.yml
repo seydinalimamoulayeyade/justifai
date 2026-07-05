@@ -1,0 +1,51 @@
+name: JustifAI CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  terraform:
+    name: Terraform — fmt / validate / plan
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.6.6"
+
+      - name: Format check
+        run: terraform fmt -check -recursive
+
+      - name: Init (backend désactivé pour la validation)
+        run: terraform init -backend=false
+
+      - name: Validate
+        run: terraform validate
+
+      # Le plan réel nécessite des identifiants AWS (secrets du dépôt).
+      # Décommenter et configurer aws-actions/configure-aws-credentials pour l'activer.
+      # - name: Plan
+      #   run: terraform plan -var="notification_email=${{ secrets.NOTIFICATION_EMAIL }}"
+
+  lambdas:
+    name: Lambdas — lint syntaxe Node
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Vérifier la syntaxe des handlers
+        run: |
+          for f in backend/lambdas/*/index.mjs; do
+            echo "check $f"
+            node --check "$f"
+          done
